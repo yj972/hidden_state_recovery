@@ -4,6 +4,8 @@ TrajectoryBuffer: Storage for Thought-Action traces and dual rewards.
 Stores (obs, thought, action, r_PRM, R_task, belief, ...) for training.
 """
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import Any, TypeVar
 import torch

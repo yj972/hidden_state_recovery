@@ -5,6 +5,8 @@ Uses group-relative advantages for multi-turn / multi-agent or preference-based 
 Interface aligned with dual-reward setup where applicable.
 """
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import Any
 import torch

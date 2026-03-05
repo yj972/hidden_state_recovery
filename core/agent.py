@@ -1,51 +1,53 @@
 """
-System2Agent: Thought + Action policies for the Cognitive Stackelberg Game.
+System2Agent: Thought + Action policies (text-only, no classification head).
 
-The agent performs internal "Thought" (Chain-of-Thought) to reduce entropy about
-hidden intent y* before committing to an external "Action".
+The agent performs internal "Thought" (Chain-of-Thought) then an external "Action"
+(e.g. a question or an answer). Both are open-ended text; there is no fixed
+belief vector b_t or Shannon entropy computed inside the agent.
 
-Meta-actions: Ask (Information Seeking), Hypothesize (Reasoning), Answer (Terminal).
+- Process reward (r_PRM) is provided by a Black-Box Reward Model (e.g. LLM-as-Judge)
+  that implicitly evaluates information gain, efficiency, and safety.
+- Meta-actions: Ask (Information Seeking), Hypothesize (Reasoning), Answer (Terminal).
 """
+
+from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import Any, TypeVar
-import torch
 
 # ---------------------------------------------------------------------------
-# Type placeholders
+# Types: Thought and Action are text (str) or token sequences; no fixed label space
 # ---------------------------------------------------------------------------
 Observation = TypeVar("Observation")
-Thought = TypeVar("Thought")   # Internal CoT representation
-Action = TypeVar("Action")     # Meta-action: Ask | Hypothesize | Answer
-HiddenState = TypeVar("HiddenState")
-BeliefState = TypeVar("BeliefState")
+Thought = TypeVar("Thought")   # Typically str or sequence of tokens
+Action = TypeVar("Action")      # Typically str (question/response text)
 
 
 class System2Agent(ABC):
     """
-    Abstract agent with separable Thought policy and Action policy.
+    Abstract agent with separable Thought and Action policies.
 
-    - Thought policy: given obs (and optionally belief), produce internal thought (CoT).
-    - Action policy: given obs + thought (and optionally belief), produce meta-action.
+    Purely generative: outputs text (Thought + Action). No classification head
+    over a finite label space; no belief state b_t or entropy computed here.
+    Reward is assigned externally by a RewardModel (e.g. LLM-as-Judge).
     """
 
     def __init__(self, **kwargs: Any) -> None:
         pass
 
     # ---------------------------------------------------------------------------
-    # Thought policy (entropy reduction / information seeking)
+    # Thought policy: produce internal CoT (text)
     # ---------------------------------------------------------------------------
 
     @abstractmethod
     def think(
         self,
         observation: Observation,
-        belief: BeliefState | None = None,
         **kwargs: Any,
     ) -> Thought:
         """
-        Produce internal thought (Chain-of-Thought) from observation (and optional belief).
-        Used to reduce entropy about y* before acting.
+        Produce internal thought (Chain-of-Thought) from observation.
+        Returns text or token sequence; no belief vector.
         """
         ...
 
@@ -53,17 +55,17 @@ class System2Agent(ABC):
     def get_thought_logits_or_sample(
         self,
         observation: Observation,
-        belief: BeliefState | None = None,
         deterministic: bool = False,
         **kwargs: Any,
-    ) -> tuple[Thought, dict[str, torch.Tensor] | None]:
+    ) -> tuple[Thought, dict[str, Any] | None]:
         """
-        For RL: return thought and optional dict (logits, log_probs, entropy) for loss.
+        For RL: return thought and optional aux (e.g. log_probs, entropy from LM).
+        Thought is text/tokens; no classification logits.
         """
         ...
 
     # ---------------------------------------------------------------------------
-    # Action policy (Ask / Hypothesize / Answer)
+    # Action policy: produce external action (text, e.g. question or answer)
     # ---------------------------------------------------------------------------
 
     @abstractmethod
@@ -71,11 +73,10 @@ class System2Agent(ABC):
         self,
         observation: Observation,
         thought: Thought,
-        belief: BeliefState | None = None,
         **kwargs: Any,
     ) -> Action:
         """
-        Given observation and thought, produce meta-action (Ask | Hypothesize | Answer).
+        Given observation and thought, produce action (e.g. question or answer text).
         """
         ...
 
@@ -84,32 +85,31 @@ class System2Agent(ABC):
         self,
         observation: Observation,
         thought: Thought,
-        belief: BeliefState | None = None,
         deterministic: bool = False,
         **kwargs: Any,
-    ) -> tuple[Action, dict[str, torch.Tensor] | None]:
+    ) -> tuple[Action, dict[str, Any] | None]:
         """
-        For RL: return action and optional dict (logits, log_probs, entropy) for loss.
+        For RL: return action and optional aux (e.g. log_probs from LM).
+        Action is text; no classification logits.
         """
         ...
 
     # ---------------------------------------------------------------------------
-    # Optional: unified step for rollout
+    # Unified step for rollout
     # ---------------------------------------------------------------------------
 
     def step(
         self,
         observation: Observation,
-        belief: BeliefState | None = None,
         deterministic: bool = False,
         **kwargs: Any,
-    ) -> tuple[Thought, Action, dict[str, torch.Tensor] | None]:
+    ) -> tuple[Thought, Action, dict[str, Any] | None]:
         """One agent step: think then act. Returns (thought, action, aux_dict)."""
         thought, thought_aux = self.get_thought_logits_or_sample(
-            observation, belief, deterministic=deterministic, **kwargs
+            observation, deterministic=deterministic, **kwargs
         )
         action, action_aux = self.get_action_logits_or_sample(
-            observation, thought, belief, deterministic=deterministic, **kwargs
+            observation, thought, deterministic=deterministic, **kwargs
         )
         aux = {}
         if thought_aux:

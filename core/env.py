@@ -6,6 +6,8 @@ StackelbergEnv: POMDP wrapper for the Cognitive Stackelberg Game.
 - Observations expose information that updates belief; y* remains hidden until outcome.
 """
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import Any, Generic, TypeVar
 import gymnasium as gym
