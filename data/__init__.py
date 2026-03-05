@@ -1,6 +1,4 @@
-"""
-Data adapters (the "Apps"): abstract dataset loader and domain-specific loaders.
-"""
+"""Data: BaseStackelbergDataset + medical (DDXPlus), multiwoz, coding stub."""
 
 from .base_dataset import BaseStackelbergDataset
 

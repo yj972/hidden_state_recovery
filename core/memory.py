@@ -1,8 +1,4 @@
-"""
-TrajectoryBuffer: Storage for Thought-Action traces and dual rewards.
-
-Stores (obs, thought, action, r_PRM, R_task, belief, ...) for training.
-"""
+"""TrajectoryBuffer ABC: (obs, thought, action, r_PRM, R_task) for training."""
 
 from __future__ import annotations
 

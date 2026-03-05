@@ -1,9 +1,4 @@
-"""
-Main entry point: orchestrate training for System 2 Reasoning Agents (Cognitive Stackelberg).
-
-Wires: Dataset -> StackelbergPOMDP Env -> System2Agent (HF LM) -> RewardModel -> DualStepPPOTrainer.
-Supports --dry_run with dummy model/dataset for debugging.
-"""
+"""Entry: Dataset -> StackelbergPOMDP -> System2Agent -> RewardModel -> DualStepPPOTrainer. Use --dry_run to test."""
 
 from __future__ import annotations
 
@@ -17,9 +12,6 @@ from typing import Any
 
 import torch
 
-# ---------------------------------------------------------------------------
-# Imports: core, data, algorithms
-# ---------------------------------------------------------------------------
 from core.agent import System2Agent
 from core.env import StackelbergEnv
 from core.rewards import HeuristicRewardModel, LLMRewardModel, RewardModel

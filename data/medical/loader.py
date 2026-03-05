@@ -275,50 +275,22 @@ class DDXPlusEnvironment(DDXPlusLoader):
         return set(self._patient_symptom_ids[patient_id])
 
 
-# ---------------------------------------------------------------------------
-# Test / demo
-# ---------------------------------------------------------------------------
-
-def _sample_output(env: DDXPlusEnvironment) -> dict[str, Any]:
-    """Build the required JSON sample output from one case."""
-    sample = env[0]
-    return {
-        "initial_complaint": sample["initial_complaint"],
-        "ground_truth_disease": sample["hidden_state"],
-        "user_positive_symptoms": sample["user_positive_symptoms"],
-    }
-
-
 if __name__ == "__main__":
     import sys
-
     print("Loading DDXPlus (english)...", flush=True)
     try:
         env = DDXPlusEnvironment()
     except Exception as e:
         import traceback
         traceback.print_exc(file=sys.stderr)
-        print(f"Load error: {e}", file=sys.stderr)
         sys.exit(1)
-
-    print(f"Dataset size: {len(env)} rows.\n")
-
-    # Sample case in required JSON-like format
+    print(f"Dataset size: {len(env)} rows.")
     sample = env[0]
-    out = {
+    print(json.dumps({
         "initial_complaint": sample["initial_complaint"],
         "ground_truth_disease": sample["hidden_state"],
         "user_positive_symptoms": sample["user_positive_symptoms"],
-    }
-    print("Sample case:")
-    print(json.dumps(out, indent=2, ensure_ascii=False))
-
-    # Test check_symptom
-    pid = 0
-    positive = sample["user_positive_symptoms"]
-    if positive:
-        sym_name = positive[0]
-        result = env.check_symptom(pid, sym_name)
-        print(f"\ncheck_symptom(patient_id={pid}, symptom_name={repr(sym_name)}) -> {result}")
-    else:
-        print("\n(No positive symptoms in first sample to test check_symptom)")
+    }, indent=2, ensure_ascii=False))
+    if sample["user_positive_symptoms"]:
+        r = env.check_symptom(0, sample["user_positive_symptoms"][0])
+        print(f"check_symptom(0, first_symptom) -> {r}")

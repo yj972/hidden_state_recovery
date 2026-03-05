@@ -1,10 +1,4 @@
-"""
-Core module: Abstract Base Classes for the Cognitive Stackelberg RL framework.
-- StackelbergEnv: POMDP wrapper (hidden state y*)
-- System2Agent: Thought + Action policies (text-only, no classification head)
-- RewardModel: Black-box process reward (LLM-as-Judge or heuristic)
-- TrajectoryBuffer: Thought-Action traces
-"""
+"""Core ABCs: StackelbergEnv, System2Agent, RewardModel, TrajectoryBuffer."""
 
 from .env import StackelbergEnv
 from .agent import System2Agent

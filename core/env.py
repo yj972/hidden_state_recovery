@@ -1,17 +1,10 @@
-"""
-StackelbergEnv: POMDP wrapper for the Cognitive Stackelberg Game.
-
-- Hidden state: y* (ground truth, e.g. true disease, bug root cause)
-- Belief state: b_t (agent's distribution over y*)
-- Observations expose information that updates belief; y* remains hidden until outcome.
-"""
+"""StackelbergEnv: POMDP with hidden y*, belief b_t; Gymnasium reset/step."""
 
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import Any, Generic, TypeVar
 import gymnasium as gym
-import torch
 
 # ---------------------------------------------------------------------------
 # Type placeholders for hidden state and belief (domain-specific)

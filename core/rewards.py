@@ -1,16 +1,4 @@
-"""
-Model-Based Reward Shaping: Black-Box Process Reward via LLM-as-Judge.
-
-We no longer compute explicit Shannon entropy (−∑ p log p). In open-ended domains
-(coding, law, etc.) the label space Y is infinite, so a fixed belief vector b_t is
-not feasible. Instead, r_PRM is produced by a Reward Model (Teacher LLM or heuristic)
-that evaluates:
-  - Information Gain: Did this question narrow down the hypothesis space? (implicit entropy reduction)
-  - Efficiency: Was this question necessary?
-  - Safety: Did it miss critical risks?
-
-The "entropy reduction" is a latent concept judged by the model, not a computed scalar.
-"""
+"""Process reward r_PRM via RewardModel (LLM-as-Judge or heuristic); no explicit entropy."""
 
 from __future__ import annotations
 

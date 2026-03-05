@@ -1,14 +1,4 @@
-"""
-System2Agent: Thought + Action policies (text-only, no classification head).
-
-The agent performs internal "Thought" (Chain-of-Thought) then an external "Action"
-(e.g. a question or an answer). Both are open-ended text; there is no fixed
-belief vector b_t or Shannon entropy computed inside the agent.
-
-- Process reward (r_PRM) is provided by a Black-Box Reward Model (e.g. LLM-as-Judge)
-  that implicitly evaluates information gain, efficiency, and safety.
-- Meta-actions: Ask (Information Seeking), Hypothesize (Reasoning), Answer (Terminal).
-"""
+"""System2Agent: Thought then Action (text-only); reward from external RewardModel."""
 
 from __future__ import annotations
 

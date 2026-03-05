@@ -1,11 +1,4 @@
-"""
-Dual-Step PPO: Rollout (Think -> Act) and policy update for System 2 Agents.
-
-- Rollout: o_t -> sample τ_t (think), sample a_t (act), env.step(a_t) -> r_ext,
-  r_PRM from RewardModel; r_total = r_ext + r_PRM. Store (o_t, τ_t, a_t, r_total, log_probs).
-- GAE for advantages.
-- PPO update: gradient through BOTH thought and action tokens (macro-action MVP).
-"""
+"""Dual-Step PPO: rollout (Think->Act), GAE, train_step with macro-action (thought+action) gradient."""
 
 from __future__ import annotations
 
@@ -469,44 +462,3 @@ class DualStepPPOTrainer:
         }
 
 
-# ---------------------------------------------------------------------------
-# Keep abstract base for type/docs; concrete class is DualStepPPOTrainer
-# ---------------------------------------------------------------------------
-
-
-class PPODualReward:
-    """
-    PPO with dual rewards (process + task). Use DualStepPPOTrainer for implementation.
-    """
-
-    def __init__(
-        self,
-        agent: Any,
-        buffer: Any,
-        weight_process: float = 1.0,
-        weight_task: float = 1.0,
-        **kwargs: Any,
-    ) -> None:
-        self.agent = agent
-        self.buffer = buffer
-        self.weight_process = weight_process
-        self.weight_task = weight_task
-
-    def combine_rewards(
-        self,
-        reward_process: torch.Tensor,
-        reward_task: torch.Tensor,
-        **kwargs: Any,
-    ) -> torch.Tensor:
-        return self.weight_process * reward_process + self.weight_task * reward_task
-
-    def compute_advantages(
-        self,
-        rewards: torch.Tensor,
-        values: torch.Tensor,
-        dones: torch.Tensor,
-        gamma: float = 0.99,
-        gae_lambda: float = 0.95,
-        **kwargs: Any,
-    ) -> tuple[torch.Tensor, torch.Tensor]:
-        return compute_advantages(rewards, values, dones, gamma=gamma, gae_lambda=gae_lambda)

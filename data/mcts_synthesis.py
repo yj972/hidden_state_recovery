@@ -1,10 +1,4 @@
-"""
-MCTS Synthesis: Generate "Super-Reasoning" trajectories via Monte Carlo Tree Search.
-
-For each medical case we run MCTS to explore the solution space; the best trajectory
-(by visit count) is saved as Gold Standard for SFT. Uses a SOTA policy (e.g. OpenAI API)
-for expansion and DDXPlusEnvironment as the deterministic user simulator.
-"""
+"""MCTS for medical cases: expand with SOTA policy, simulate with DDXPlus; save best trajectory as SFT gold."""
 
 from __future__ import annotations
 
@@ -15,17 +9,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable
 
-# ---------------------------------------------------------------------------
-# MCTS Node
-# ---------------------------------------------------------------------------
-
-
 @dataclass
 class MCTSNode:
-    """
-    state: conversation history as list of (thought_cot, action, user_response).
-    Root has state = [(None, None, initial_complaint)].
-    """
+    """state = [(thought, action, user_response), ...]; root = [(None, None, initial_complaint)]."""
     state: list[tuple[Any, Any, Any]]  # (thought, action, user_response) per turn
     parent: MCTSNode | None = None
     children: list[MCTSNode] = field(default_factory=list)
@@ -50,10 +36,6 @@ class MCTSNode:
             return self.value / self.visits
         return self.value / self.visits + c * math.sqrt(math.log(p.visits + 1) / self.visits)
 
-
-# ---------------------------------------------------------------------------
-# Policy: get_top_k_actions(history, k=3) via SOTA model (e.g. OpenAI)
-# ---------------------------------------------------------------------------
 
 TOP_K_ACTIONS_PROMPT = """You are a clinical diagnostician. Given the conversation history below, propose exactly {k} DISTINCT strategic questions to narrow down the patient's diagnosis. Each question should be a single short sentence (e.g. "Do you have chest pain?"). Output ONLY a JSON array of {k} strings, no other text.
 
