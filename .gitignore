@@ -1,0 +1,30 @@
+# Bytecode / cache
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.so
+.env
+.venv
+venv/
+env/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+*.swp
+*.swo
+
+# Outputs / checkpoints
+outputs/
+checkpoints/
+*.pt
+*.pth
+wandb/
+logs/
+
+# Data (optional: uncomment if data is large)
+# data/raw/
+# *.csv
+# *.jsonl
