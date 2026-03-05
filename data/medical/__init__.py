@@ -1,7 +1,7 @@
 """
-Medical app: DDXPlus (Differential Diagnosis) dataset loader.
+Medical app: DDXPlus (Differential Diagnosis) dataset loader and user simulation env.
 """
 
-from .loader import DDXPlusLoader
+from .loader import DDXPlusEnvironment, DDXPlusLoader
 
-__all__ = ["DDXPlusLoader"]
+__all__ = ["DDXPlusLoader", "DDXPlusEnvironment"]

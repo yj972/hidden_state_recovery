@@ -7,6 +7,8 @@ Each sample provides (or can be used to construct):
 - Optional belief prior, action space, etc.
 """
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import Any, Iterator, TypeVar
 
